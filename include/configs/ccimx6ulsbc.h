@@ -58,11 +58,14 @@
 
 #define CONFIG_SYS_FSL_USDHC_NUM	1
 
-/* U-Boot Environment on eMMC*/
-#define CONFIG_ENV_IS_IN_FAT
-#define FAT_ENV_INTERFACE "mmc"
-#define FAT_ENV_DEVICE_AND_PART "0:1"
-#define FAT_ENV_FILE "uboot-env.bin"
+/* U-Boot Environment is in NAND*/
+#define CONFIG_ENV_IS_IN_NAND
+#define CONFIG_ENV_OFFSET		(3 * SZ_1M)
+#define CONFIG_SYS_REDUNDANT_ENVIRONMENT
+#define CONFIG_DYNAMIC_ENV_LOCATION
+#define CONFIG_ENV_PARTITION_SIZE	(1 * SZ_1M)
+#define CONFIG_ENV_RANGE		CONFIG_ENV_PARTITION_SIZE
+
 
 /* Serial port */
 #define CONFIG_MXC_UART
