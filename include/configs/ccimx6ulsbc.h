@@ -107,7 +107,7 @@
 		"setfsargs=setenv bootargs ${bootargs} root=/dev/mmcblk${mmcdev}p${mmcrootpart} rootfstype=ext4 rw\0" \
 		"setbootargs=run setconsoleargs && run setfsargs && echo Set bootargs to ${bootargs}...\0" \
 		"bootkernel=bootz ${loadaddr} - ${fdtaddr}\0" \
-		"netconsole=setenv ncip $serverip; setenv bootdelay 10; setenv stdin nc; setenv stdout nc; setenv stderr nc; version;\0" \
+		"netconsole=setenv ncip $serverip; setenv stdin nc; setenv stdout nc; setenv stderr nc;\0" \
 
 #define CONFIG_BOOTCOMMAND \
 		"echo !! DEFAULT BOOT !!" \
