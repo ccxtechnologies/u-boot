@@ -80,6 +80,12 @@
 #define IMX_FEC_BASE			ENET_BASE_ADDR
 #define CONFIG_FEC_MXC_PHYADDR          0x0
 #define CONFIG_FEC_XCV_TYPE             RMII
+#define CONFIG_PREBOOT		"echo;echo --- CCX Technologies DataPHY ---;echo"
+#define CONFIG_IPADDR		192.168.43.9
+#define CONFIG_SERVERIP		192.168.43.1
+#define CONFIG_GATEWAYIP	192.168.43.1
+#define CONFIG_NETMASK		255.255.255.0
+#define CONFIG_ETHADDR		ce:ce:ce:ce:ce:ce
 
 #define CONFIG_SYS_MMC_IMG_LOAD_PART	1
 
@@ -100,13 +106,14 @@
 		"setconsoleargs=setenv bootargs ${bootargs} console=${console},${baudrate}\0" \
 		"setfsargs=setenv bootargs ${bootargs} root=/dev/mmcblk${mmcdev}p${mmcrootpart} rootfstype=ext4 rw\0" \
 		"setbootargs=run setconsoleargs && run setfsargs && echo Set bootargs to ${bootargs}...\0" \
-		"bootkernel=bootz ${loadaddr} - ${fdtaddr}\0"
+		"bootkernel=bootz ${loadaddr} - ${fdtaddr}\0" \
+		"netconsole=setenv ncip $serverip; setenv bootdelay 10; setenv stdin nc; setenv stdout nc; setenv stderr nc; version;\0" \
 
 #define CONFIG_BOOTCOMMAND \
-		"echo DEFAULT BOOT !! BOOT DRIVE IS CORRUPTED !!" \
+		"echo !! DEFAULT BOOT !!" \
 		" && run loadall"\
 		" && run setbootargs"\
-		" && run bootkernel"
+		" && run bootkernel" \
 
 #define CONFIG_BOOTDELAY               3
 
