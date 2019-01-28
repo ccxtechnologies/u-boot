@@ -83,6 +83,9 @@
 /* The environment may use any good blocks within the "environment" partition */
 #define CONFIG_ENV_RANGE		CONFIG_ENV_PARTITION_SIZE
 
+#define CONFIG_CMD_EXPORTENV
+#define CONFIG_CMD_IMPORTENV
+
 /* Serial port */
 #define CONFIG_MXC_UART
 #define CONFIG_MXC_UART_BASE		UART5_BASE
@@ -115,13 +118,13 @@
 #define CONFIG_SERVERIP		192.168.43.1
 #define CONFIG_GATEWAYIP	192.168.43.1
 #define CONFIG_NETMASK		255.255.255.0
-#define CONFIG_ETHADDR	ce:ce:ce:ce:ce:ce
 
 /* I2C */
 #define CONFIG_SYS_I2C_MXC_I2C1
 #define CONFIG_SYS_I2C_MXC_I2C2
 
 #define CONFIG_EXTRA_ENV_SETTINGS \
+		"ethaddr=ce:ce:ce:ce:ce:ce\0" \
 		"fdtaddr=0x83000000\0" \
 		"fdtfile=/boot/linux.dtb\0" \
 		"kernelfile=/boot/zImage\0" \
