@@ -363,6 +363,7 @@ dtb-$(CONFIG_MX6) += imx6ul-14x14-ddr3-arm2.dtb \
 	imx6q-sabresd.dtb \
 	imx6qp-sabresd.dtb \
 	imx6ul-ccimx6ulsbc.dtb \
+	imx6ul-dataphy.dtb \
 	imx6ul-ccimx6ulstarter.dtb \
 	imx6ul-geam-kit.dtb \
 	imx6dqscm-1gb-qwks-rev2-fix-ldo.dtb \
