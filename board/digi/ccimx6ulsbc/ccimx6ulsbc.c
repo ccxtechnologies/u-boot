@@ -246,7 +246,7 @@ void reset_phy(void)
 		/* Deassert PHY reset (high) */
 		mca_update_bits(MCA_GPIO_DATA_0, reset, reset);
 	} else if (CONFIG_FEC_ENET_DEV == 1) {
-		/* CPU GPIO5_6 is connected to PHY reset */
+		/* CPU GPIO6_6 is connected to PHY reset */
 		reset = IMX_GPIO_NR(5, 6);
 		/* Assert PHY reset (low) */
 		gpio_request(reset, "ENET PHY Reset");

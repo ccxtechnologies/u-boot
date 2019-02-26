@@ -91,15 +91,6 @@ static iomux_v3_cfg_t const uart5_pads[] = {
 	MX6_PAD_UART5_RX_DATA__UART5_DCE_RX | MUX_PAD_CTRL(UART_PAD_CTRL),
 };
 
-#ifdef CONFIG_CONSOLE_ENABLE_GPIO
-static iomux_v3_cfg_t const ext_gpios_pads[] = {
-	MX6_PAD_NAND_CE1_B__GPIO4_IO14 | MUX_PAD_CTRL(GPI_PAD_CTRL),
-	MX6_PAD_GPIO1_IO05__GPIO1_IO05 | MUX_PAD_CTRL(GPI_PAD_CTRL),
-	MX6_PAD_GPIO1_IO03__GPIO1_IO03 | MUX_PAD_CTRL(GPI_PAD_CTRL),
-	MX6_PAD_GPIO1_IO02__GPIO1_IO02 | MUX_PAD_CTRL(GPI_PAD_CTRL),
-};
-#endif
-
 /* micro SD */
 static iomux_v3_cfg_t const usdhc2_pads[] = {
 	MX6_PAD_CSI_VSYNC__USDHC2_CLK | MUX_PAD_CTRL(USDHC_PAD_CTRL),
@@ -110,11 +101,6 @@ static iomux_v3_cfg_t const usdhc2_pads[] = {
 	MX6_PAD_CSI_DATA03__USDHC2_DATA3 | MUX_PAD_CTRL(USDHC_PAD_CTRL),
 };
 
-#ifdef CONFIG_FEC_MXC
-/*
- * pin conflicts for fec1 and fec2, GPIO1_IO06 and GPIO1_IO07 can only
- * be used for ENET1 or ENET2, cannot be used for both.
- */
 static iomux_v3_cfg_t const fec1_pads[] = {
 	MX6_PAD_GPIO1_IO06__ENET1_MDIO | MUX_PAD_CTRL(MDIO_PAD_CTRL),
 	MX6_PAD_GPIO1_IO07__ENET1_MDC | MUX_PAD_CTRL(ENET_PAD_CTRL),
@@ -128,135 +114,37 @@ static iomux_v3_cfg_t const fec1_pads[] = {
 	MX6_PAD_ENET1_RX_EN__ENET1_RX_EN | MUX_PAD_CTRL(ENET_PAD_CTRL),
 };
 
-static iomux_v3_cfg_t const fec2_pads[] = {
-	MX6_PAD_GPIO1_IO06__ENET2_MDIO | MUX_PAD_CTRL(MDIO_PAD_CTRL),
-	MX6_PAD_GPIO1_IO07__ENET2_MDC | MUX_PAD_CTRL(ENET_PAD_CTRL),
-
-	MX6_PAD_ENET2_TX_DATA0__ENET2_TDATA00 | MUX_PAD_CTRL(ENET_PAD_CTRL),
-	MX6_PAD_ENET2_TX_DATA1__ENET2_TDATA01 | MUX_PAD_CTRL(ENET_PAD_CTRL),
-	MX6_PAD_ENET2_TX_CLK__ENET2_REF_CLK2 | MUX_PAD_CTRL(ENET_CLK_PAD_CTRL),
-	MX6_PAD_ENET2_TX_EN__ENET2_TX_EN | MUX_PAD_CTRL(ENET_PAD_CTRL),
-
-	MX6_PAD_ENET2_RX_DATA0__ENET2_RDATA00 | MUX_PAD_CTRL(ENET_PAD_CTRL),
-	MX6_PAD_ENET2_RX_DATA1__ENET2_RDATA01 | MUX_PAD_CTRL(ENET_PAD_CTRL),
-	MX6_PAD_ENET2_RX_EN__ENET2_RX_EN | MUX_PAD_CTRL(ENET_PAD_CTRL),
-	MX6_PAD_ENET2_RX_ER__ENET2_RX_ER | MUX_PAD_CTRL(ENET_PAD_CTRL),
-};
-
 static void setup_iomux_fec(int fec_id)
 {
-	if (fec_id == 0)
-		imx_iomux_v3_setup_multiple_pads(fec1_pads, ARRAY_SIZE(fec1_pads));
-	else
-		imx_iomux_v3_setup_multiple_pads(fec2_pads, ARRAY_SIZE(fec2_pads));
+	imx_iomux_v3_setup_multiple_pads(fec1_pads, ARRAY_SIZE(fec1_pads));
 }
-#endif
 
 static void setup_iomux_uart(void)
 {
 	imx_iomux_v3_setup_multiple_pads(uart5_pads, ARRAY_SIZE(uart5_pads));
 }
 
-#ifdef CONFIG_FSL_ESDHC
-static struct fsl_esdhc_cfg usdhc_cfg[] = {
-	{USDHC2_BASE_ADDR, 0, 4},
-};
-
-int mmc_get_env_devno(void)
-{
-	u32 soc_sbmr = readl(SRC_BASE_ADDR + 0x4);
-	int dev_no;
-	u32 bootsel;
-
-	bootsel = (soc_sbmr & 0x000000FF) >> 6 ;
-
-	/* If not boot from sd/mmc, use default value */
-	if (bootsel != 1)
-		return CONFIG_SYS_MMC_ENV_DEV;
-
-	/* BOOT_CFG2[3] and BOOT_CFG2[4] */
-	dev_no = (soc_sbmr & 0x00001800) >> 11;
-
-	if (dev_no == 1 && mx6_esdhc_fused(USDHC1_BASE_ADDR))
-		dev_no = 0;
-
-	return dev_no;
-}
-
-int board_mmc_getcd(struct mmc *mmc)
-{
-	/* CD not connected. Assume microSD card present */
-	return 1;
-}
-
-int board_mmc_init(bd_t *bis)
-{
-	int i, ret;
-
-	/*
-	 * According to the board_mmc_init() the following map is done:
-	 * (U-boot device node)    (Physical Port)
-	 * mmc0                    USDHC2
-	 */
-	for (i = 0; i < CONFIG_SYS_FSL_USDHC_NUM; i++) {
-		switch (i) {
-		case 0:
-			imx_iomux_v3_setup_multiple_pads(
-				usdhc2_pads, ARRAY_SIZE(usdhc2_pads));
-			usdhc_cfg[0].sdhc_clk = mxc_get_clock(MXC_ESDHC2_CLK);
-			break;
-		default:
-			printf("Warning: you configured more USDHC controllers"
-				"(%d) than supported by the board\n", i + 1);
-			return -EINVAL;
-		}
-
-		ret = fsl_esdhc_initialize(bis, &usdhc_cfg[i]);
-		if (ret) {
-			printf("Warning: failed to initialize mmc dev %d\n", i);
-		}
-	}
-
-	return 0;
-}
-#endif
-
-#ifdef CONFIG_FEC_MXC
 void reset_phy(void)
 {
 	int reset;
 
-	/*
-	 * The reset line must be held low for a minimum of 100usec and cannot
-	 * be deasserted before 25ms have passed since the power supply has
-	 * reached 80% of the operating voltage. At this point of the code
-	 * we can assume the second premise is already accomplished.
-	 */
-	if (CONFIG_FEC_ENET_DEV == 0) {
-		/* MCA_IO7 is connected to PHY reset */
-		reset = (1 << 7);
-		/* Configure as output */
-		mca_update_bits(MCA_GPIO_DIR_0, reset, reset);
-		/* Assert PHY reset (low) */
-		mca_update_bits(MCA_GPIO_DATA_0, reset, 0);
-		udelay(100);
-		/* Deassert PHY reset (high) */
-		mca_update_bits(MCA_GPIO_DATA_0, reset, reset);
-	} else if (CONFIG_FEC_ENET_DEV == 1) {
-		/* CPU GPIO5_6 is connected to PHY reset */
-		reset = IMX_GPIO_NR(5, 6);
-		/* Assert PHY reset (low) */
-		gpio_request(reset, "ENET PHY Reset");
-		gpio_direction_output(reset, 0);
-		udelay(100);
-		/* Deassert PHY reset (high) */
-		gpio_set_value(reset, 1);
-	}
+	/* CPU GPIO5_1 is connected to PHY reset */
+	reset = IMX_GPIO_NR(5, 1);
+
+	/* Assert PHY reset (low) */
+	gpio_request(reset, "ENET PHY Reset");
+	gpio_direction_output(reset, 0);
+	udelay(100);
+
+	/* Deassert PHY reset (high) */
+	gpio_set_value(reset, 1);
 }
 
 int board_eth_init(bd_t *bis)
 {
 	int ret;
+
+	reset_phy();
 
 	setup_iomux_fec(CONFIG_FEC_ENET_DEV);
 
@@ -264,8 +152,6 @@ int board_eth_init(bd_t *bis)
 		CONFIG_FEC_MXC_PHYADDR, IMX_FEC_BASE);
 	if (ret)
 		printf("FEC%d MXC: %s:failed\n", CONFIG_FEC_ENET_DEV, __func__);
-
-	reset_phy();
 
 	return 0;
 }
@@ -311,9 +197,7 @@ int board_phy_config(struct phy_device *phydev)
 
 	return 0;
 }
-#endif
 
-#ifdef CONFIG_USB_EHCI_MX6
 #define USB_OTHERREGS_OFFSET	0x800
 #define UCTRL_PWR_POL		(1 << 9)
 
@@ -351,7 +235,6 @@ int board_ehci_hcd_init(int port)
 
 	return 0;
 }
-#endif
 
 int board_early_init_f(void)
 {
@@ -359,7 +242,6 @@ int board_early_init_f(void)
 	return 0;
 }
 
-#ifdef CONFIG_POWER
 int power_init_board(void)
 {
 	/* SOM power init */
@@ -367,20 +249,13 @@ int power_init_board(void)
 
 	return 0;
 }
-#endif
 
 int board_init(void)
 {
 	/* SOM init */
 	ccimx6ul_init();
-
-#ifdef	CONFIG_FEC_MXC
 	setup_fec(CONFIG_FEC_ENET_DEV);
-#endif
-
-#ifdef CONFIG_USB_EHCI_MX6
 	setup_usb();
-#endif
 
 	return 0;
 }
@@ -394,13 +269,10 @@ int board_late_init(void)
 	return 0;
 }
 
-#if defined(CONFIG_OF_BOARD_SETUP)
-/* Platform function to modify the FDT as needed */
 int ft_board_setup(void *blob, bd_t *bd)
 {
 	return 0;
 }
-#endif /* CONFIG_OF_BOARD_SETUP */
 
 int checkboard(void)
 {

@@ -19,7 +19,6 @@
 /* FLASH and environment organization */
 #define CONFIG_SYS_BOOT_NAND
 
-#if defined(CONFIG_SYS_BOOT_NAND)
 #define CONFIG_SYS_USE_NAND
 #define CONFIG_ENV_IS_IN_NAND
 #define CONFIG_CMD_MTDPARTS
@@ -28,13 +27,7 @@
 #define CONFIG_CMD_UPDATE_NAND
 #define CONFIG_SYS_STORAGE_MEDIA	"nand"
 #define CONFIG_CMD_BOOTSTREAM
-#else
-#define CONFIG_ENV_IS_IN_MMC
-#define CONFIG_CMD_UPDATE_MMC
-#define CONFIG_SYS_STORAGE_MEDIA	"mmc"
-#endif
 
-#ifdef CONFIG_SYS_USE_NAND
 #define CONFIG_CMD_NAND
 #define CONFIG_CMD_NAND_TRIMFFS
 
@@ -49,24 +42,13 @@
 #define CONFIG_APBH_DMA
 #define CONFIG_APBH_DMA_BURST
 #define CONFIG_APBH_DMA_BURST8
-#endif
 
 #define CONFIG_SYS_FSL_USDHC_NUM	1
 
 /* U-Boot Environment */
-#if defined(CONFIG_ENV_IS_IN_MMC)
-#define CONFIG_ENV_OFFSET		(8 * SZ_64K)
-#elif defined(CONFIG_ENV_IS_IN_SPI_FLASH)
-#define CONFIG_ENV_OFFSET		(768 * 1024)
-#define CONFIG_ENV_SPI_BUS		CONFIG_SF_DEFAULT_BUS
-#define CONFIG_ENV_SPI_CS		CONFIG_SF_DEFAULT_CS
-#define CONFIG_ENV_SPI_MODE		CONFIG_SF_DEFAULT_MODE
-#define CONFIG_ENV_SPI_MAX_HZ		CONFIG_SF_DEFAULT_SPEED
-#elif defined(CONFIG_ENV_IS_IN_NAND)
 #undef CONFIG_ENV_SIZE
 #define CONFIG_ENV_OFFSET		(3 * SZ_1M)
 #define CONFIG_ENV_SIZE			SZ_128K
-#endif
 #define CONFIG_SYS_REDUNDANT_ENVIRONMENT
 #define CONFIG_DYNAMIC_ENV_LOCATION
 #if (CONFIG_DDR_MB == 1024)
@@ -88,25 +70,12 @@
 #define CONSOLE_DEV			"ttymxc4"
 #define CONFIG_BAUDRATE			115200
 
-/* Ethernet */
-#define CONFIG_FEC_ENET_DEV		0
-#if (CONFIG_FEC_ENET_DEV == 0)
-#define IMX_FEC_BASE			ENET_BASE_ADDR
-#define CONFIG_FEC_MXC_PHYADDR          0x0
-#define CONFIG_ETHPRIME                 "FEC0"
-#define CONFIG_FEC_XCV_TYPE             RMII
-#elif (CONFIG_FEC_ENET_DEV == 1)
-#define IMX_FEC_BASE			ENET2_BASE_ADDR
-#define CONFIG_FEC_MXC_PHYADDR          0x1
-#define CONFIG_ETHPRIME                 "FEC1"
-#define CONFIG_FEC_XCV_TYPE             RMII
-#endif
-
 #define CONFIG_NETCONSOLE 1
 
-#define IMX_FEC_BASE			ENET_BASE_ADDR
-#define CONFIG_FEC_MXC_PHYADDR          0x0
-#define CONFIG_FEC_XCV_TYPE             RMII
+#define IMX_FEC_BASE		ENET_BASE_ADDR
+#define CONFIG_FEC_MXC_PHYADDR  0x1
+#define CONFIG_ETHPRIME         "FEC0"
+#define CONFIG_FEC_XCV_TYPE     RMII
 #define CONFIG_PREBOOT		"echo;echo --- CCX Technologies DataPHY ---;echo"
 #define CONFIG_IPADDR		192.168.43.9
 #define CONFIG_SERVERIP		192.168.43.1
@@ -118,7 +87,10 @@
 #define CONFIG_SYS_I2C_MXC_I2C2
 
 #define CONFIG_EXTRA_ENV_SETTINGS \
-		"ethaddr=ce:ce:ce:ce:ce:ce\0" \
+		"ethaddr=ce:ce:ce:ce:ce:01\0" \
+		"eth1addr=ce:ce:ce:ce:ce:02\0" \
+		"wlanaddr=ce:ce:ce:ce:ce:03\0" \
+		"btaddr=ce:ce:ce:ce:ce:04\0" \
 		"fdtaddr=0x83000000\0" \
 		"fdtfile=/boot/linux.dtb\0" \
 		"kernelfile=/boot/zImage\0" \
@@ -134,7 +106,13 @@
 		"setbootargs=run setconsoleargs && run setfsargs && echo Set bootargs to ${bootargs}...\0" \
 		"bootkernel=bootz ${loadaddr} - ${fdtaddr}\0" \
 		"netconsole=setenv ncip $serverip; setenv stdin nc; setenv stdout nc; setenv stderr nc;\0" \
-		"bootcmd_mfg=echo Manufacturing Mode\0" \
+		"mtdparts=mtdparts=gpmi-nand:3m(bootloader),1m(environment),1m(safe),12m(linux),14m(recovery),122m(rootfs),-(update)\0" \
+		"bootcmd_mfg=echo Manufacturing Mode == BURNING FUSES FOR NAND BOOT ==; "\
+		"fuse prog -y 0 5 0x00002000; "\
+		"fuse prog -y 0 5 0x00000800; "\
+		"fuse prog -y 0 5 0x00000080; "\
+		"fuse prog -y 0 5 0x00000010; "\
+		"fuse prog -y 0 6 0x00000010;\0" \
 
 #define CONFIG_BOOTCOMMAND \
 		"echo !! DEFAULT BOOT !!" \
