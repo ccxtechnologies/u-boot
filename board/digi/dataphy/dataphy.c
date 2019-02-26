@@ -125,7 +125,7 @@ static void setup_iomux_uart(void)
 }
 
 static struct fsl_esdhc_cfg usdhc_cfg[] = {
-	{USDHC2_BASE_ADDR, 0, 4},
+	{USDHC2_BASE_ADDR},
 };
 
 int mmc_get_env_devno(void)

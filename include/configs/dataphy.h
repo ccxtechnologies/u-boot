@@ -76,7 +76,6 @@
 #define CONFIG_FEC_MXC_PHYADDR  0x1
 #define CONFIG_ETHPRIME         "FEC0"
 #define CONFIG_FEC_XCV_TYPE     RMII
-#define CONFIG_PREBOOT		"echo;echo --- CCX Technologies DataPHY ---;echo"
 #define CONFIG_IPADDR		192.168.43.9
 #define CONFIG_SERVERIP		192.168.43.1
 #define CONFIG_GATEWAYIP	192.168.43.1
