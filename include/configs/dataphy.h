@@ -129,4 +129,4 @@
 #define CONFIG_LZO
 #define CONFIG_DIGI_UBI
 
-#endif /* CCIMX6ULSBC_CONFIG_H */
+#endif
