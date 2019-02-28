@@ -95,13 +95,14 @@
 		"kernelfile=/boot/zImage\0" \
 		"console=" CONSOLE_DEV "\0" \
 		"mmcdev=0\0" \
+		"mmclinuxdev=0\0" \
 		"mmcrootpart=2\0" \
 		"loadfdt=ext4load mmc ${mmcdev}:${mmcrootpart} ${fdtaddr} ${fdtfile}\0"\
 		"loadkernel=ext4load mmc ${mmcdev}:${mmcrootpart} ${loadaddr} ${kernelfile}\0"\
 		"loadall=mmc dev ${mmcdev} && mmc rescan && run loadkernel && run loadfdt\0"\
 		"bootargs=rootwait\0"\
 		"setconsoleargs=setenv bootargs ${bootargs} console=${console},${baudrate}\0"\
-		"setfsargs=setenv bootargs ${bootargs} root=/dev/mmcblk${mmcdev}p${mmcrootpart} rootfstype=ext4 rw\0"\
+		"setfsargs=setenv bootargs ${bootargs} root=/dev/mmcblk${mmclinuxdev}p${mmcrootpart} rootfstype=ext4 rw\0"\
 		"setbootargs=run setconsoleargs && run setfsargs && echo Set bootargs to ${bootargs}...\0"\
 		"bootkernel=bootz ${loadaddr} - ${fdtaddr}\0"\
 		"netconsole=setenv ncip $serverip; setenv stdin nc; setenv stdout nc; setenv stderr nc;\0"\
