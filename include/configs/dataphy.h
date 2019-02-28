@@ -96,16 +96,18 @@
 		"console=" CONSOLE_DEV "\0" \
 		"mmcdev=0\0" \
 		"mmcrootpart=2\0" \
-		"loadfdt=ext4load mmc ${mmcdev}:${mmcrootpart} ${fdtaddr} ${fdtfile}\0" \
-		"loadkernel=ext4load mmc ${mmcdev}:${mmcrootpart} ${loadaddr} ${kernelfile}\0" \
-		"loadall=mmc dev ${mmcdev} && mmc rescan && run loadkernel && run loadfdt\0" \
-		"bootargs=rootwait\0" \
-		"setconsoleargs=setenv bootargs ${bootargs} console=${console},${baudrate}\0" \
-		"setfsargs=setenv bootargs ${bootargs} root=/dev/mmcblk${mmcdev}p${mmcrootpart} rootfstype=ext4 rw\0" \
-		"setbootargs=run setconsoleargs && run setfsargs && echo Set bootargs to ${bootargs}...\0" \
-		"bootkernel=bootz ${loadaddr} - ${fdtaddr}\0" \
-		"netconsole=setenv ncip $serverip; setenv stdin nc; setenv stdout nc; setenv stderr nc;\0" \
-		"mtdparts=mtdparts=gpmi-nand:3m(bootloader),1m(environment),1m(safe),12m(linux),14m(recovery),122m(rootfs),-(update)\0" \
+		"loadfdt=ext4load mmc ${mmcdev}:${mmcrootpart} ${fdtaddr} ${fdtfile}\0"\
+		"loadkernel=ext4load mmc ${mmcdev}:${mmcrootpart} ${loadaddr} ${kernelfile}\0"\
+		"loadall=mmc dev ${mmcdev} && mmc rescan && run loadkernel && run loadfdt\0"\
+		"bootargs=rootwait\0"\
+		"setconsoleargs=setenv bootargs ${bootargs} console=${console},${baudrate}\0"\
+		"setfsargs=setenv bootargs ${bootargs} root=/dev/mmcblk${mmcdev}p${mmcrootpart} rootfstype=ext4 rw\0"\
+		"setbootargs=run setconsoleargs && run setfsargs && echo Set bootargs to ${bootargs}...\0"\
+		"bootkernel=bootz ${loadaddr} - ${fdtaddr}\0"\
+		"netconsole=setenv ncip $serverip; setenv stdin nc; setenv stdout nc; setenv stderr nc;\0"\
+		"mtdparts=mtdparts=gpmi-nand:3m(bootloader),1m(environment),1m(safe),12m(linux),14m(recovery),122m(rootfs),-(update)\0"\
+		"bootusb=echo Booting From USB...&& run loadusb && run setconsoleargs && setenv bootargs ${bootargs} root=/dev/sda2 rootfstype=ext4 rw && run bootkernel\0"\
+		"loadusb=usb reset && ext4load usb 0:2 ${loadaddr} ${kernelfile} && ext4load usb 0:2 ${fdtaddr} ${fdtfile}\0"\
 		"bootcmd_mfg=echo Manufacturing Mode == BURNING FUSES FOR NAND BOOT ==; "\
 		"fuse prog -y 0 5 0x00002000; "\
 		"fuse prog -y 0 5 0x00000800; "\
