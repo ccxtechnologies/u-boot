@@ -72,9 +72,6 @@ DECLARE_GLOBAL_DATA_PTR;
 
 #define ENET_CLK_PAD_CTRL  (PAD_CTL_DSE_40ohm   | PAD_CTL_SRE_FAST)
 
-#define ENET_RX_PAD_CTRL  (PAD_CTL_PKE | PAD_CTL_PUE |          \
-	PAD_CTL_SPEED_HIGH   | PAD_CTL_SRE_FAST)
-
 #define OTG_ID_PAD_CTRL (PAD_CTL_PKE | PAD_CTL_PUE |		\
 	PAD_CTL_PUS_47K_UP  | PAD_CTL_SPEED_LOW |		\
 	PAD_CTL_DSE_80ohm   | PAD_CTL_SRE_FAST  | PAD_CTL_HYS)
@@ -83,8 +80,9 @@ DECLARE_GLOBAL_DATA_PTR;
 	PAD_CTL_PUS_100K_DOWN | PAD_CTL_SPEED_MED |               \
 	PAD_CTL_DSE_40ohm   | PAD_CTL_SRE_FAST)
 
-#define LCD_PAD_CTRL    (PAD_CTL_HYS | PAD_CTL_PUS_100K_UP | PAD_CTL_PUE | \
-	PAD_CTL_PKE | PAD_CTL_SPEED_MED | PAD_CTL_DSE_40ohm)
+static iomux_v3_cfg_t const ext_gpios_pads[] = {
+	MX6_PAD_LCD_DATA05__GPIO3_IO10 | MUX_PAD_CTRL(GPI_PAD_CTRL),
+};
 
 static iomux_v3_cfg_t const uart5_pads[] = {
 	MX6_PAD_UART5_TX_DATA__UART5_DCE_TX | MUX_PAD_CTRL(UART_PAD_CTRL),
@@ -315,6 +313,28 @@ int power_init_board(void)
 	return 0;
 }
 
+int get_io_card_type(void)
+{
+	int a717_gpio = IMX_GPIO_NR(3, 10);
+	char cmd[80];
+
+	imx_iomux_v3_setup_multiple_pads(ext_gpios_pads,
+					 ARRAY_SIZE(ext_gpios_pads));
+	gpio_request(a717_gpio, "IO Card");
+	gpio_direction_input(a717_gpio);
+	if(gpio_get_value(a717_gpio)) {
+		printf("CCX IO Board: ARINC-429/ARINC-717\n");
+		sprintf(cmd, "setenv -f io_board 100405");
+		run_command(cmd, 0);
+	} else {
+		printf("CCX IO Board: ARINC-429/RS-422\n");
+		sprintf(cmd, "setenv -f io_board 100121");
+		run_command(cmd, 0);
+	}
+
+	return 0;
+}
+
 int board_init(void)
 {
 	/* SOM init */
@@ -330,6 +350,8 @@ int board_late_init(void)
 	/* SOM late init */
 	ccimx6ul_late_init();
 	set_wdog_reset((struct wdog_regs *)WDOG1_BASE_ADDR);
+
+	get_io_card_type();
 
 	return 0;
 }
