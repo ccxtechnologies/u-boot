@@ -206,6 +206,15 @@
 #define MCA_CTRL_0_RESET		BIT(0)
 #define MCA_CTRL_0_SAVE_CFG		BIT(3)
 
+/* MCA_CC6UL_PWR_CTRL_0 (addr=0x0028) */
+#define MCA_PWR_KEY_SLEEP_EN	BIT(0)
+#define MCA_PWR_KEY_OFF_EN	BIT(1)
+#define MCA_PWR_GUARD_EN	BIT(2)
+#define MCA_PWR_GO_OFF		BIT(3)
+#define MCA_PWR_GO_SUSPEND	BIT(4)
+#define MCA_PWR_OFF_CANCEL	BIT(5)
+#define MCA_KEY_DEB_TB_50MS	BIT(6)
+
 /* MCA_TAMPER CFGn (addr=0x0037 && addr 0x0046) */
 #define MCA_TAMPER_DET_EN		BIT(0)
 

@@ -307,6 +307,14 @@ int board_early_init_f(void)
 
 int power_init_board(void)
 {
+	int ret;
+
+	/* Disable Power Button and Cancel any in process events */
+	ret = mca_write_reg(MCA_PWR_CTRL_0, MCA_PWR_OFF_CANCEL);
+	if (ret) {
+		printf("MCA Power Button: Failed to disable Power Button\n");
+	}
+
 	/* SOM power init */
 	power_init_ccimx6ul();
 
